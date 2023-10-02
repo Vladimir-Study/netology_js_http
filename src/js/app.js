@@ -32,6 +32,21 @@ async function getRequest(path, method, body = null) {
   };
 }
 
+async function updateCurrentStatus() {
+  const allTicketsStatus = document.querySelectorAll('.ticket-status');
+  allTicketsStatus.forEach((elem) => {
+    elem.addEventListener('click', async () => {
+      const currentStatus = elem.checked;
+      const currentTicket = elem.parentNode;
+      const ticketId = currentTicket.getAttribute('id');
+      ticketData.id = ticketId;
+      ticketData.status = currentStatus;
+      const sendBody = JSON.stringify(ticketData);
+      await getRequest('?method=editStatus', 'PUT', sendBody);
+    });
+  });
+}
+
 async function showAllTickets() {
   const getAllTickets = await getRequest('?method=allTickets', 'GET');
 
@@ -42,6 +57,7 @@ async function showAllTickets() {
   showDescription();
   closeTicket();
   editTicket();
+  updateCurrentStatus();
 }
 
 function closeTicket() {
@@ -73,8 +89,8 @@ function editTicket() {
       const ticket = await getRequest(`?method=ticketById&id=${ticketId}`, 'GET');
       editedTicket = ticket.result[0];
       const currentEditTicket = editTicketBlock.childNodes[1];
-      currentEditTicket.childNodes[5].value = editedTicket.name;
-      currentEditTicket.childNodes[9].value = editedTicket.description;
+      currentEditTicket.querySelector('.short-description-form').value = editedTicket.name;
+      currentEditTicket.querySelector('.full-description-form').value = editedTicket.description;
       editedTicket.status = event.target.parentNode.parentNode.childNodes[0].checked;
     });
   });
@@ -82,8 +98,8 @@ function editTicket() {
 
 editFormBtn.addEventListener('click', async (event) => {
   event.preventDefault();
-  editedTicket.name = event.target.parentNode.childNodes[5].value;
-  editedTicket.description = event.target.parentNode.childNodes[9].value;
+  editedTicket.name = event.target.parentNode.querySelector('.short-description-form').value;
+  editedTicket.description = event.target.parentNode.querySelector('.full-description-form').value;
   const sendBody = JSON.stringify(editedTicket);
   const response = await getRequest('?method=editTicket', 'PUT', sendBody);
   if (response.status === 200) {
@@ -100,7 +116,7 @@ function showDescription() {
   allTickets = document.querySelectorAll('.ticket');
 
   allTickets.forEach((elem) => {
-    const shortDescription = elem.childNodes[1].childNodes[0];
+    const shortDescription = elem.querySelector('.ticket-short-description');
     shortDescription.style = 'cursor:pointer';
 
     shortDescription.addEventListener('click', async () => {
