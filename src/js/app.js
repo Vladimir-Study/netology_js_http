@@ -88,7 +88,7 @@ function editTicket() {
       editTicketBlock.classList.remove('on-show');
       const ticket = await getRequest(`?method=ticketById&id=${ticketId}`, 'GET');
       editedTicket = ticket.result[0];
-      const currentEditTicket = editTicketBlock.childNodes[1];
+      const currentEditTicket = editTicketBlock.querySelector('.add-ticket-form');
       currentEditTicket.querySelector('.short-description-form').value = editedTicket.name;
       currentEditTicket.querySelector('.full-description-form').value = editedTicket.description;
       editedTicket.status = event.target.parentNode.parentNode.childNodes[0].checked;
